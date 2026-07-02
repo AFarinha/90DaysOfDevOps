@@ -59,3 +59,16 @@ git log --oneline --graph --all --decorate
 cat version01.txt
 git push -u origin development
 git push -u origin production
+
+#### Task 3
+git switch production
+cat version01.txt
+nano version01.txt
+git cherry-pick e76355c
+git add .
+git cherry-pick --continue
+echo "Added few more changes to make it more optimized." >> version01.txt
+git add .
+git commit -m "Optimized the feature"
+cat version01.txt
+git push
