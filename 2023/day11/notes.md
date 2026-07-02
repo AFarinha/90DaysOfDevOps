@@ -24,3 +24,38 @@ git push
 git branch -d stash-target
 git branch -d stash-demo
 git branch
+
+
+#### Task 2
+git switch -c development
+cat version01.txt
+cat > version01.txt << EOF
+This is the bug fix in development branch
+EOF
+cat version01.txt
+git add .
+git commit -m "version01.txt updated"
+git push origin development
+git branch
+echo "After bug fixing, this is the new feature with minor alteration" >> version01.txt
+git add version01.txt
+git commit -m "Added feature2.1 in development branch"
+echo "This is the advancement of previous feature" >> version01.txt
+git add version01.txt
+git commit -m "Added feature2.2 in development branch"
+echo "Feature 2 is completed and ready for release" >> version01.txt
+git add version01.txt
+git commit -m "Feature2 completed"
+cat version01.txt
+git log --oneline
+cat version01.txt
+git push
+git push origin development
+git switch master
+git pull
+git switch -c production
+git rebase development
+git log --oneline --graph --all --decorate
+cat version01.txt
+git push -u origin development
+git push -u origin production
