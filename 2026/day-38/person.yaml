@@ -1,0 +1,12 @@
+---
+name: Andre Farinha
+role: DevOps learner
+experience_years: 0
+learning: true
+tools:
+  - linux
+  - git
+  - docker
+  - docker-compose
+  - kubernetes
+hobbies: [reading, homelab, automation]

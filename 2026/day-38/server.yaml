@@ -1,0 +1,22 @@
+---
+server:
+  name: devops-lab
+  ip: 192.168.56.10
+  port: 22
+
+database:
+  host: db.internal
+  name: appdb
+  credentials:
+    user: appuser
+    password: change-me
+
+startup_script_literal: |
+  #!/bin/sh
+  echo "Starting application"
+  ./start-app.sh
+  echo "Application started"
+
+startup_script_folded: >
+  This server starts the application after the database is reachable
+  and writes status information to the service logs.
