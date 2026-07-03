@@ -1,0 +1,4 @@
+Line 1: DevOps needs clear notes.
+Line 2: Logs and configs are text files.
+Line 3: Practice makes commands faster.
+

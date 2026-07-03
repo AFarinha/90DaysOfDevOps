@@ -1,0 +1,2 @@
+Paste the collected Nginx access or error log snippets here after running the Day 08 exercise.
+
