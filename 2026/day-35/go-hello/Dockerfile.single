@@ -1,0 +1,11 @@
+FROM golang:1.22-bookworm
+
+WORKDIR /src
+
+COPY go.mod .
+COPY main.go .
+
+RUN go build -o /usr/local/bin/day35-app .
+
+CMD ["day35-app"]
+
