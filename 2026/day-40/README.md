@@ -17,7 +17,7 @@ This is the moment CI/CD stops being a concept and becomes real.
 ## Challenge Tasks
 
 ### Task 1: Set Up
-1. Create a new **public** GitHub repository called `github-actions-practice`
+1. Create a new **public** GitHub repository called `git `
 2. Clone it locally
 3. Create the folder structure: `.github/workflows/`
 
