@@ -1,4 +1,4 @@
-# Day 44 – Secrets, Artifacts & Running Real Tests in CI
+cd .# Day 44 – Secrets, Artifacts & Running Real Tests in CI
 
 ## Task
 Today your pipeline starts doing **real work** — storing sensitive values securely, saving build outputs, and running actual tests from your previous days.
