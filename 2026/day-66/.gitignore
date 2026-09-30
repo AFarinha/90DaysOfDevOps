@@ -1,0 +1,10 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfstate.d/
+*.tfplan
+crash.log
+*.local.tfvars
+backend.hcl
+inventory.local.ini
+kubeconfig
