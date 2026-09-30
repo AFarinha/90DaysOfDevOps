@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: config-env
+  labels:
+    app: config-env
+spec:
+  containers:
+  - name: config-env
+    image: busybox:1.36
+    command:
+    - sh
+    - -c
+    - printf "%s\n" "$APP_ENV" "$APP_DEBUG" "$APP_PORT"; sleep 3600
+    envFrom:
+    - configMapRef:
+        name: app-config

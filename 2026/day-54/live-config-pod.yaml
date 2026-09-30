@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: live-config-reader
+  labels:
+    app: live-config-reader
+spec:
+  containers:
+  - name: live-config-reader
+    image: busybox:1.36
+    command:
+    - sh
+    - -c
+    - while true; do cat /config/message; echo; sleep 5; done
+    volumeMounts:
+    - name: config
+      mountPath: /config
+  volumes:
+  - name: config
+    configMap:
+      name: live-config
