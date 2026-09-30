@@ -1,0 +1,9 @@
+timezone: Europe/Lisbon
+project_name: devops-app
+app_env: development
+common_packages:
+- curl
+- git
+- jq
+- unzip
+lab_mode: false

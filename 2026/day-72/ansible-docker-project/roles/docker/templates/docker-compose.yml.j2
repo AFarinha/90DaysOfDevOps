@@ -1,0 +1,6 @@
+services:
+  app:
+    image: {{ docker_app_image }}:{{ docker_app_tag }}
+    restart: always
+    ports:
+      - "127.0.0.1:{{ docker_app_port }}:{{ docker_container_port }}"

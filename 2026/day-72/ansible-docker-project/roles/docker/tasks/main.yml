@@ -1,0 +1,86 @@
+- name: Install repository dependencies
+  ansible.builtin.apt:
+    name:
+    - ca-certificates
+    - curl
+    - python3-requests
+    state: present
+- name: Create keyring directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+- name: Download Docker signing key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+- name: Configure Docker repository
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/docker.sources
+    mode: '0644'
+    content: 'Types: deb
+
+      URIs: https://download.docker.com/linux/ubuntu
+
+      Suites: {{ ansible_distribution_release }}
+
+      Components: stable
+
+      Architectures: {{ "amd64" if ansible_architecture == "x86_64" else "arm64" }}
+
+      Signed-By: /etc/apt/keyrings/docker.asc
+
+      '
+  register: docker_repo
+- name: Install Docker and Compose plugin
+  ansible.builtin.apt:
+    name:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose-plugin
+    state: present
+    update_cache: '{{ docker_repo.changed }}'
+  when: not (lab_mode | bool)
+- name: Start Docker daemon
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+  when: not (lab_mode | bool)
+- name: Add deploy user to Docker group
+  ansible.builtin.user:
+    name: deploy
+    groups: docker
+    append: true
+  when: not (lab_mode | bool)
+- name: Log into Docker Hub with Vault credentials
+  community.docker.docker_login:
+    username: '{{ vault_docker_username }}'
+    password: '{{ vault_docker_password }}'
+  become_user: deploy
+  when: vault_docker_username is defined and vault_docker_username | length > 0
+  no_log: true
+- name: Pull application image
+  community.docker.docker_image:
+    name: '{{ docker_app_image }}'
+    tag: '{{ docker_app_tag }}'
+    source: pull
+- name: Run application container
+  community.docker.docker_container:
+    name: '{{ docker_app_name }}'
+    image: '{{ docker_app_image }}:{{ docker_app_tag }}'
+    state: started
+    restart_policy: always
+    published_ports:
+    - 127.0.0.1:{{ docker_app_port }}:{{ docker_container_port }}
+- name: Check application readiness
+  ansible.builtin.uri:
+    url: http://127.0.0.1:{{ docker_app_port }}
+    status_code: 200
+  register: health_check
+  until: health_check.status == 200
+  retries: 10
+  delay: 3
+  when: not ansible_check_mode
