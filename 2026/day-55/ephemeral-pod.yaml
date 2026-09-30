@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ephemeral
+  labels:
+    app: ephemeral
+spec:
+  containers:
+  - name: ephemeral
+    image: busybox:1.36
+    command:
+    - sh
+    - -c
+    - date -u > /data/message.txt; sleep 3600
+    volumeMounts:
+    - name: data
+      mountPath: /data
+  volumes:
+  - name: data
+    emptyDir: {}
