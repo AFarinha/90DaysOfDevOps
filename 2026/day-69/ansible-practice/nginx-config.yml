@@ -1,0 +1,37 @@
+---
+- name: Manage Nginx configuration on Ubuntu
+  hosts: web
+  become: true
+  tasks:
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+    - name: Deploy validated Nginx configuration
+      ansible.builtin.copy:
+        src: files/nginx.conf
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: '0644'
+        validate: /usr/sbin/nginx -t -c %s
+      notify: Restart Nginx
+    - name: Deploy custom index
+      ansible.builtin.copy:
+        content: "<h1>Managed by Ansible</h1><p>Server: {{ inventory_hostname }}</p>\n"
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Start and enable Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+  handlers:
+    - name: Restart Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted

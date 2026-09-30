@@ -1,0 +1,23 @@
+---
+- name: Install and start Nginx on Ubuntu web servers
+  hosts: web
+  become: true
+  tasks:
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+    - name: Start and enable Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+    - name: Create the custom page
+      ansible.builtin.copy:
+        content: "<h1>Deployed by Ansible - TerraWeek Server</h1>\n"
+        dest: /var/www/html/index.nginx-debian.html
+        owner: root
+        group: root
+        mode: '0644'

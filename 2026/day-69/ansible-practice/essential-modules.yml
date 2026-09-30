@@ -1,0 +1,62 @@
+---
+- name: Practice essential modules on Ubuntu servers
+  hosts: all
+  become: true
+  tasks:
+    - name: Install utility packages
+      ansible.builtin.apt:
+        name: [git, curl, wget, tree]
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+    - name: Remove the optional tree utility
+      ansible.builtin.apt:
+        name: tree
+        state: absent
+      tags: [never, remove-package]
+    - name: Ensure web Nginx is running
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+      when: "'web' in group_names"
+    - name: Copy application configuration
+      ansible.builtin.copy:
+        src: files/app.conf
+        dest: /etc/app.conf
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Create application directory
+      ansible.builtin.file:
+        path: /opt/myapp
+        state: directory
+        owner: ubuntu
+        mode: '0755'
+    - name: Read disk space
+      ansible.builtin.command: df -h
+      register: disk_output
+      changed_when: false
+      become: false
+      tags: [diagnostics]
+    - name: Print disk space
+      ansible.builtin.debug:
+        var: disk_output.stdout_lines
+      tags: [diagnostics]
+    - name: Count processes using a pipeline
+      ansible.builtin.shell: ps -e --no-headers | wc -l
+      register: process_count
+      changed_when: false
+      become: false
+      tags: [diagnostics]
+    - name: Print process count
+      ansible.builtin.debug:
+        msg: "Total processes: {{ process_count.stdout }}"
+      tags: [diagnostics]
+    - name: Set environment timezone
+      ansible.builtin.lineinfile:
+        path: /etc/environment
+        regexp: '^TZ='
+        line: 'TZ=Europe/Lisbon'
+        create: true
+        mode: '0644'
