@@ -1,0 +1,3 @@
+resource "aws_s3_bucket" "imported" {
+ bucket = "REPLACE_WITH_EXISTING_BUCKET"
+}
