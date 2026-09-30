@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pending
+  labels:
+    app: pending
+spec:
+  containers:
+  - name: pending
+    image: busybox:1.36
+    command:
+    - sh
+    - -c
+    - sleep 3600
+    resources:
+      requests:
+        cpu: '100'
+        memory: 128Gi
