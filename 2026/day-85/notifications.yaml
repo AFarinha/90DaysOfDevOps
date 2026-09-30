@@ -1,0 +1,37 @@
+# Create argocd-notifications-secret with lab-webhook-url privately before use.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  namespace: argocd
+data:
+  service.webhook.lab: |
+    url: $lab-webhook-url
+    headers:
+      - name: Content-Type
+        value: application/json
+  trigger.on-sync-succeeded: |
+    - when: app.status.operationState.phase in ['Succeeded']
+      oncePer: app.status.sync.revision
+      send: [app-sync-succeeded]
+  trigger.on-sync-failed: |
+    - when: app.status.operationState.phase in ['Error', 'Failed']
+      send: [app-sync-failed]
+  trigger.on-health-degraded: |
+    - when: app.status.health.status == 'Degraded'
+      send: [app-health-degraded]
+  template.app-sync-succeeded: |
+    webhook:
+      lab:
+        method: POST
+        body: '{"application":"{{.app.metadata.name}}","event":"sync-succeeded"}'
+  template.app-sync-failed: |
+    webhook:
+      lab:
+        method: POST
+        body: '{"application":"{{.app.metadata.name}}","event":"sync-failed"}'
+  template.app-health-degraded: |
+    webhook:
+      lab:
+        method: POST
+        body: '{"application":"{{.app.metadata.name}}","event":"health-degraded"}'

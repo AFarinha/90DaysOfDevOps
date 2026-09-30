@@ -1,0 +1,50 @@
+# HTTP-only local exercise; no public AWS load balancer or TLS claim.
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy-gateway
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: bankapp-local-gateway
+  namespace: bankapp-local
+spec:
+  gatewayClassName: envoy-gateway
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: bankapp-local-route
+  namespace: bankapp-local
+spec:
+  parentRefs:
+    - name: bankapp-local-gateway
+  rules:
+    - backendRefs:
+        - name: bankapp-local-bankapp-service
+          port: 8080
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: bankapp-local-session
+  namespace: bankapp-local
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: bankapp-local-route
+  loadBalancer:
+    type: ConsistentHash
+    consistentHash:
+      type: Cookie
+      cookie:
+        name: BANKAPP_AFFINITY
+        ttl: 3600s

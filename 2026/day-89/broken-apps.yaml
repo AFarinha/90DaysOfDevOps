@@ -1,0 +1,60 @@
+# Deployments match the current KubeHealer remediation implementation.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  namespace: days89-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: web-app}
+  template:
+    metadata:
+      labels: {app: web-app}
+    spec:
+      containers:
+        - name: web
+          image: ngnix:latest
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memory-app
+  namespace: days89-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: memory-app}
+  template:
+    metadata:
+      labels: {app: memory-app}
+    spec:
+      containers:
+        - name: app
+          image: python:3.12-alpine
+          command: [python, -c, "x = bytearray(100 * 1024 * 1024); import time; time.sleep(3600)"]
+          resources:
+            requests:
+              memory: 16Mi
+            limits:
+              memory: 32Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-app
+  namespace: days89-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: config-app}
+  template:
+    metadata:
+      labels: {app: config-app}
+    spec:
+      containers:
+        - name: app
+          image: nginx:alpine
+          envFrom:
+            - configMapRef:
+                name: app-config

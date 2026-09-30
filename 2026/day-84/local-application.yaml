@@ -1,0 +1,25 @@
+# Local validation uses the previously completed chart on the user's public repo.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bankapp-local
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AFarinha/90DaysOfDevOps.git
+    targetRevision: master
+    path: 2026/day-80/bankapp
+    helm:
+      valueFiles: [values-dev.yaml]
+      parameters:
+        - name: ollama.enabled
+          value: 'false'
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: bankapp-local
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions: [CreateNamespace=true]

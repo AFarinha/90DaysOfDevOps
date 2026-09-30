@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: bankapp-team
+  namespace: argocd
+spec:
+  description: BankApp team with explicit repository and namespace scope
+  sourceRepos:
+    - https://github.com/TrainWithShubham/AI-BankApp-DevOps.git
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: bankapp
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+    - group: storage.k8s.io
+      kind: StorageClass
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  roles:
+    - name: developer
+      description: View and sync BankApp only
+      groups: [bankapp-developers]
+      policies:
+        - p, proj:bankapp-team:developer, applications, get, bankapp-team/*, allow
+        - p, proj:bankapp-team:developer, applications, sync, bankapp-team/*, allow
