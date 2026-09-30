@@ -1,0 +1,19 @@
+rule_files:
+- alert-rules.yml
+evaluation_interval: 15s
+tests:
+- interval: 15s
+  input_series:
+  - series: up{job="notes-app",instance="notes-app:8000"}
+    values: 0+0x8
+  alert_rule_test:
+  - eval_time: 90s
+    alertname: TargetDown
+    exp_alerts:
+    - exp_labels:
+        job: notes-app
+        instance: notes-app:8000
+        severity: critical
+      exp_annotations:
+        summary: TargetDown
+        description: Instance notes-app:8000; current value 0
