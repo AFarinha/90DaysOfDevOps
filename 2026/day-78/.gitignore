@@ -1,0 +1,8 @@
+.reference/
+.cache/
+.runtime/
+.env
+.vault_pass
+*.tgz
+chart-repo/
+__pycache__/
