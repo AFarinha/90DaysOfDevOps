@@ -1,0 +1,45 @@
+name: day73-observability
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+    - 127.0.0.1:9090:9090
+    volumes:
+    - prometheus_data:/prometheus
+    - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+    - monitoring
+    restart: unless-stopped
+    command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    - --storage.tsdb.retention.time=30d
+    - --storage.tsdb.retention.size=1GB
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+  notes-app:
+    image: day73-notes-app:lab
+    ports:
+    - 127.0.0.1:8000:8000
+    networks:
+    - monitoring
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+    build:
+      context: ../.reference/notes-app
+    volumes:
+    - ./app:/lab:ro
+    command:
+    - python
+    - /lab/start-app.py
+volumes:
+  prometheus_data: {}
+networks:
+  monitoring:
+    driver: bridge
