@@ -1,0 +1,34 @@
+---
+- name: Loop demo
+  hosts: all
+  become: true
+  vars:
+    users:
+      - {name: deploy, groups: sudo}
+      - {name: monitor, groups: sudo}
+      - {name: appuser, groups: users}
+    directories: [/opt/app/logs, /opt/app/config, /opt/app/data, /opt/app/tmp]
+  tasks:
+    - name: Create users
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: "{{ item.groups }}"
+        append: true
+        state: present
+      loop: "{{ users }}"
+    - name: Create directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop: "{{ directories }}"
+    - name: Install utility packages
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop: [git, curl, unzip, jq]
+    - name: Print user specification
+      ansible.builtin.debug:
+        msg: "Requested user {{ item.name }} in group {{ item.groups }}"
+      loop: "{{ users }}"
+      tags: [inspect]

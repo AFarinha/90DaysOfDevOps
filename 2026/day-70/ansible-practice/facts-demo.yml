@@ -1,0 +1,14 @@
+---
+- name: Report system facts
+  hosts: all
+  tasks:
+    - name: Show operating system information
+      ansible.builtin.debug:
+        msg: >-
+          Hostname: {{ ansible_facts.hostname }},
+          OS: {{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }},
+          RAM: {{ ansible_facts.memtotal_mb }}MB,
+          IP: {{ ansible_facts.get('default_ipv4', {}).get('address', 'unavailable') }}
+    - name: Show network interfaces
+      ansible.builtin.debug:
+        var: ansible_facts.interfaces
