@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "bankapp.fullname" . }}-db-ready
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  activeDeadlineSeconds: 180
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: db-check
+          image: busybox:1.36
+          command: [sh, -c, "until nc -z {{ include "bankapp.mysqlHost" . }} 3306; do sleep 3; done"]
+          resources:
+            requests: {memory: 32Mi, cpu: 50m}
+            limits: {memory: 64Mi, cpu: 100m}

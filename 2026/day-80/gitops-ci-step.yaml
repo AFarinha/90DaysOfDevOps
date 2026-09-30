@@ -1,0 +1,14 @@
+# Reference steps for an existing image-build workflow; not an active repository workflow.
+- name: Update production image tag
+  env:
+    GIT_SHA: ${{ steps.tag.outputs.sha_short }}
+  run: |
+    yq -i '.bankapp.image.tag = strenv(GIT_SHA)' 2026/day-80/bankapp/values-prod.yaml
+    helm lint 2026/day-80/bankapp -f 2026/day-80/bankapp/values-prod.yaml
+- name: Commit reviewed values change
+  run: |
+    git config user.name "github-actions[bot]"
+    git config user.email "github-actions[bot]@users.noreply.github.com"
+    git add 2026/day-80/bankapp/values-prod.yaml
+    git diff --staged --quiet || git commit -m "ci: update bankapp image [skip ci]"
+    git push

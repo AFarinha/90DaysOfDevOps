@@ -1,0 +1,3 @@
+Release {{ .Release.Name }} deployed to {{ .Release.Namespace }}.
+Forward the app with: kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "bankapp.fullname" . }}-service 8080:{{ .Values.bankapp.service.port }}
+Create the existing credential Secret before installing this chart.

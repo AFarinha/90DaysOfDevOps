@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bankapp
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AFarinha/90DaysOfDevOps.git
+    targetRevision: master
+    path: 2026/day-80/bankapp
+    helm:
+      valueFiles:
+      - values-prod.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: bankapp
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true

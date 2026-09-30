@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "bankapp.fullname" . }}-test
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  containers:
+    - name: test
+      image: busybox:1.36
+      command: [sh, -c, "wget -qO- http://{{ include "bankapp.fullname" . }}-service:{{ .Values.bankapp.service.port }}/actuator/health"]
