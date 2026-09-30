@@ -1,0 +1,5 @@
+http_port: 80
+app_name: myapp
+max_connections: 512
+app_env: development
+manage_service: true

@@ -1,0 +1,9 @@
+- name: Validate database secret presence
+  hosts: db
+  tasks:
+  - name: Assert secrets are configured
+    ansible.builtin.assert:
+      that:
+      - vault_db_password | length > 0
+      - vault_db_root_password | length > 0
+    no_log: true
